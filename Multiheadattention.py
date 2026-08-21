@@ -40,3 +40,4 @@ class MultiHeadAttention(nn.Module):
         # Concatenate heads and apply final linear layer
         attention_output = attention_output.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model) #here, we first transpose the attention_output tensor to bring the num_heads dimension back to its original position. Then, we use contiguous() to ensure that the tensor is stored in a contiguous block of memory, which is necessary for the subsequent view operation. Finally, we reshape the tensor to have the shape (batch_size, seq_len, d_model) by combining the num_heads and d_k dimensions back into a single d_model dimension.
         output = self.W_O(attention_output)
+        return output

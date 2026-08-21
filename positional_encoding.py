@@ -30,4 +30,4 @@ class PositionalEncoding(torch.nn.Module):
     def forward(self, x):
         # x is expected to have shape (batch_size, seq_len, embedding_dim)
         seq_len = x.size(1)
-        return x + self.pe[:, :seq_len]
+        return x + self.pe[:, :seq_len] 

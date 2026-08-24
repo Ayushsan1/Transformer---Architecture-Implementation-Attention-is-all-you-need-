@@ -6,6 +6,7 @@ from positional_encoding import PositionalEncoding
 from Multiheadattention import MultiHeadAttention
 from input_embedding import InputEmbedding
 from config import d_model as configured_d_model, num_heads as configured_num_heads, max_length_seq as configured_max_length_seq
+from config import src_vocab_size as configured_src_vocab_size
 from config import d_ff as configured_d_ff
 from config import num_layers as configured_num_layers
 
@@ -25,15 +26,17 @@ class EncoderLayer(nn.Module):
          x = self.AddNorm2(x, ffn_output)
 
          return x
+
 class TransformerEncoder(nn.Module):
     def __init__(self,
+                 vocab_size: int = configured_src_vocab_size,
                  d_model: int = configured_d_model,
                  num_heads: int = configured_num_heads,
                  max_length_seq: int = configured_max_length_seq,
                  d_ff: int = configured_d_ff,
                  num_layers: int = configured_num_layers):
         super().__init__()
-        self.embedding = InputEmbedding(d_model=d_model)
+        self.embedding = InputEmbedding(vocab_size=vocab_size, d_model=d_model)
         self.positional_encoding = PositionalEncoding(d_model, max_length_seq)
 
         self.layers = nn.ModuleList([
@@ -49,3 +52,24 @@ class TransformerEncoder(nn.Module):
             x = layer(x)
 
         return x
+
+
+if __name__ == "__main__":
+    from input_embedding import Tokenizer
+    import torch
+
+    tokenizer = Tokenizer()
+    text = "This is our Transformer first layer"
+    encoded_text = torch.tensor(tokenizer.encode(text), dtype=torch.long).unsqueeze(0)
+
+    model = TransformerEncoder(
+        vocab_size=tokenizer.vocab_size,
+        d_model= configured_d_model,
+        num_layers= configured_num_layers,
+        num_heads= configured_num_heads,
+        d_ff= configured_d_ff
+    )
+
+    output = model(encoded_text)
+    print("Encoder output shape:", output.shape)
+

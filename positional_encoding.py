@@ -2,6 +2,7 @@
 import math
 
 import torch
+import torch.nn as nn
 
 from config import d_model as configured_d_model
 from config import max_length_seq as configured_max_length_seq

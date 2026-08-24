@@ -2,22 +2,25 @@
 
 A step-by-step, object-oriented implementation of the original Transformer architecture using Python and PyTorch.
 
-This project is being developed as a learning-focused implementation of the Transformer described in *Attention Is All You Need*. Each major stage of the architecture will be implemented in its own Python file so that the individual components can be understood, tested, and combined into a complete encoder-decoder model.
+This project is a learning-focused implementation of the Transformer described in *Attention Is All You Need*. Each major stage of the architecture is implemented in its own Python file so that the individual components can be understood, tested, and combined.
 
-> **Project status:** This architecture is still under development. The current repository contains the initial building blocks; the complete Transformer has not been finished yet.
+> **Project status:** The encoder side is complete and functional. It can tokenize text, embed the token IDs, add positional information, and run the configured stack of encoder layers. The decoder and full encoder-decoder training pipeline are planned next.
 
 ## What This Project Demonstrates
 
 The implementation uses object-oriented programming to model Transformer components as reusable classes. Each class owns its parameters and forward-pass behavior, while PyTorch's `nn.Module` provides the common foundation for trainable neural-network components.
 
-The current design includes:
+The current implementation includes:
 
 - A central `config.py` file for shared Transformer hyperparameters
 - A `Tokenizer` class for converting text into token IDs
 - An `InputEmbedding` class for converting token IDs into vector representations
 - A `PositionalEncoding` class for adding token-order information
-- An initial `ScaledDotProductAttention` class for calculating attention scores
-- Separate files for each stage so the architecture can be assembled progressively
+- Multi-head self-attention
+- Residual connections and layer normalization
+- A position-wise feed-forward network using GELU
+- A configurable stack of encoder layers
+- A runnable `TransformerEncoder` entry point
 
 Shared dimensions and hyperparameters are intended to come from `config.py`, allowing the individual modules to work together consistently as the project grows.
 
@@ -37,10 +40,10 @@ flowchart LR
     H --> I[Target token IDs]
     I --> J[Target Embedding]
     J --> K[Add Positional Encoding]
-    K --> L[Decoder Stack]
+    K --> L[Decoder Stack - planned]
 
     F --> L
-    L --> M[Linear Projection]
+    L --> M[Linear Projection - planned]
     M --> N[Softmax]
     N --> O[Target token probabilities]
 ```
@@ -76,25 +79,27 @@ flowchart TD
 
 | File | Responsibility | Status |
 | --- | --- | --- |
-| `config.py` | Shared vocabulary sizes, model dimensions, layer counts, sequence length, and dropout | Started |
+| `config.py` | Shared vocabulary sizes, model dimensions, layer counts, sequence length, and dropout | Available |
 | `check_env.py` | Checks Python, PyTorch, and CUDA availability | Available |
-| `input_embedding.py` | Tokenization and input embedding classes | Started |
-| `positional_encoding.py` | Sinusoidal positional encoding | Started |
-| `self_attention.py` | Scaled dot-product attention foundation | Started |
+| `input_embedding.py` | Tokenization and input embedding classes | Complete |
+| `positional_encoding.py` | Sinusoidal positional encoding | Complete |
+| `Multiheadattention.py` | Multi-head self-attention | Complete |
+| `AddNorm.py` | Residual connection followed by layer normalization | Complete |
+| `MLP.py` | Position-wise feed-forward network | Complete |
+| `Encoder_block.py` | Encoder layer and configurable encoder stack | Complete |
+| `self_attention.py` | Scaled dot-product attention foundation | Available |
+| `MaskMHA.py` | Masked multi-head attention foundation | Planned |
 
-## Planned File-by-File Development
+## Next Development Steps
 
-The remaining architecture will be added as individual modules rather than one large file. The planned progression is:
+The encoder is complete. The remaining architecture will be added as individual modules:
 
-1. Complete multi-head attention
-2. Add layer normalization, residual connections, and dropout
-3. Implement the position-wise feed-forward network
-4. Build an encoder layer and stack multiple encoder layers
-5. Build a decoder layer with masked self-attention and cross-attention
-6. Stack multiple decoder layers
-7. Add the final linear layer and softmax output projection
-8. Combine the encoder and decoder into a complete `Transformer` class
-9. Add masking, loss calculation, training, evaluation, and inference
+1. Implement masked self-attention for the decoder
+2. Build decoder layers with masked self-attention and cross-attention
+3. Stack multiple decoder layers
+4. Add the final linear layer and softmax output projection
+5. Combine the encoder and decoder into a complete `Transformer` class
+6. Add masking, loss calculation, training, evaluation, and inference
 
 Possible future files include:
 
@@ -127,7 +132,7 @@ The main model parameters are defined in `config.py`:
 - Maximum sequence length
 - Dropout probability
 
-Individual modules should import these shared values instead of defining conflicting local values. This keeps the components compatible when they are connected into the final Transformer architecture.
+`TransformerEncoder` uses these values by default, and each value can be overridden through its constructor. Individual modules import the shared values so the components remain compatible as they are connected.
 
 ## Setup
 
@@ -143,12 +148,20 @@ Check the environment with:
 python check_env.py
 ```
 
-Run an individual component with:
+Run the completed encoder with:
 
 ```bash
-python input_embedding.py
+python Encoder_block.py
 ```
+
+The built-in smoke test tokenizes `This is our Transformer first layer`, runs it through the encoder, and prints output similar to:
+
+```text
+Encoder output shape: torch.Size([1, 7, 512])
+```
+
+The first dimension is the batch size, the second is the token sequence length, and the final dimension is `d_model`.
 
 ## Learning Goal
 
-The purpose of this project is not only to produce a working Transformer, but also to understand how the architecture is constructed from smaller object-oriented components. As development continues, each file will represent one understandable part of the computation, and the final `Transformer` class will compose those parts into the complete model.
+The purpose of this project is not only to produce a working Transformer, but also to understand how the architecture is constructed from smaller object-oriented components. The completed encoder provides the first end-to-end path from text to contextualized representations; future decoder work will extend it into the complete Transformer model.

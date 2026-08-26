@@ -4,7 +4,7 @@ A step-by-step, object-oriented implementation of the original Transformer archi
 
 This project is a learning-focused implementation of the Transformer described in *Attention Is All You Need*. Each major stage of the architecture is implemented in its own Python file so that the individual components can be understood, tested, and combined.
 
-> **Project status:** The encoder side is complete and functional. It can tokenize text, embed the token IDs, add positional information, and run the configured stack of encoder layers. The decoder and full encoder-decoder training pipeline are planned next.
+> **Project status:** The encoder-decoder architecture is runnable. The included `transformer.py` trains on one short English-to-French example and tests greedy autoregressive translation.
 
 ## What This Project Demonstrates
 
@@ -13,7 +13,7 @@ The implementation uses object-oriented programming to model Transformer compone
 The current implementation includes:
 
 - A central `config.py` file for shared Transformer hyperparameters
-- A `Tokenizer` class for converting text into token IDs
+- A `WordTokenizer` wrapper around GPT-2 `tiktoken` for converting text into token IDs
 - An `InputEmbedding` class for converting token IDs into vector representations
 - A `PositionalEncoding` class for adding token-order information
 - Multi-head self-attention
@@ -43,7 +43,7 @@ flowchart LR
     K --> L[Decoder Stack - planned]
 
     F --> L
-    L --> M[Linear Projection - planned]
+    L --> M[Linear Projection]
     M --> N[Softmax]
     N --> O[Target token probabilities]
 ```
@@ -88,18 +88,32 @@ flowchart TD
 | `MLP.py` | Position-wise feed-forward network | Complete |
 | `Encoder_block.py` | Encoder layer and configurable encoder stack | Complete |
 | `self_attention.py` | Scaled dot-product attention foundation | Available |
-| `MaskMHA.py` | Masked multi-head attention foundation | Planned |
+| `MaskMHA.py` | Masked multi-head attention | Complete |
+| `CrossAttention.py` | Decoder-to-encoder cross-attention | Complete |
+| `Decoder_block.py` | Decoder layer and configurable decoder stack | Complete |
+| `transformer.py` | Full model, toy training loop, and greedy translation test | Complete |
 
-## Next Development Steps
+## End-to-End Translation Demo
 
-The encoder is complete. The remaining architecture will be added as individual modules:
+Run the complete toy translation experiment with:
 
-1. Implement masked self-attention for the decoder
-2. Build decoder layers with masked self-attention and cross-attention
-3. Stack multiple decoder layers
-4. Add the final linear layer and softmax output projection
-5. Combine the encoder and decoder into a complete `Transformer` class
-6. Add masking, loss calculation, training, evaluation, and inference
+```bash
+python transformer.py
+```
+
+The script uses the GPT-2 subword vocabulary and makes the learning target
+explicit:
+
+```python
+source_text = "i like apples"
+target_text = "j aime les"
+target_word = "pommes"
+```
+
+It trains with teacher forcing to predict `target_word` after `target_text`,
+then predicts the complete French sequence autoregressively.
+It is intentionally a one-example overfitting test of the architecture, not a
+general-purpose translation system.
 
 Possible future files include:
 

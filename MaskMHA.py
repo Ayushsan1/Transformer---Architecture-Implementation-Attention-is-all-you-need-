@@ -5,7 +5,7 @@ import self_attention
 from config import d_model as configured_d_model
 from config import num_heads as configured_num_heads
 
-class MultiHeadAttention(nn.Module):
+class MaskedMultiHeadAttention(nn.Module):
     def __init__(self, d_model: int = configured_d_model, num_heads: int = configured_num_heads):
         super().__init__()
         self.num_heads = num_heads

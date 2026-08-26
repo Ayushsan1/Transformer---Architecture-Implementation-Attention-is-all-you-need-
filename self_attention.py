@@ -15,7 +15,7 @@ class ScaledDotProductAttention(nn.Module):
         # Q, K, V shapes: (batch_size, num_heads, seq_len, d_k)
         scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.d_k)  # Scaled dot-product
         if mask is not None:
-            scores = scores.masked-fill(mask == 0, float('-inf'))
+            scores = scores.masked_fill(mask == 0, float('-inf'))
         attention_weights = self.softmax(scores)  # Softmax to get attention weights
         output = torch.matmul(attention_weights, V)  # Weighted sum of values
         return output, attention_weights

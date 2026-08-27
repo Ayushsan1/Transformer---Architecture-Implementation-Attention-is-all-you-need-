@@ -106,30 +106,6 @@ class Transformer(nn.Module):
 		probabilities = torch.softmax(logits, dim=-1)
 		return probabilities
 
-
-# Convert source and target text into tensors for teacher-forcing training.
-def make_training_tensors(
-	source_text: str,
-	target_text: str,
-	target_word: str,
-	source_tokenizer: WordTokenizer,
-	target_tokenizer: WordTokenizer,
-	device: torch.device,
-) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-	full_target_text = target_text + " " + target_word
-	source_tokens = torch.tensor(
-		[source_tokenizer.encode(source_text)], dtype=torch.long, device=device
-	)
-	target_tokens = torch.tensor(
-		[target_tokenizer.encode(full_target_text)], dtype=torch.long, device=device
-	)
-
-	# The decoder receives <bos> ... and learns to predict ... <eos>.
-	target_input_tokens = target_tokens[:, :-1]
-	target_labels = target_tokens[:, 1:]
-	return source_tokens, target_input_tokens, target_labels
-
-
 # Generate a translation one token at a time by choosing the highest score.
 def greedy_translate(
 	model: Transformer,

@@ -110,8 +110,8 @@ target_text = "j aime les"
 target_word = "pommes"
 ```
 
-It trains with teacher forcing to predict `target_word` after `target_text`,
-then predicts the complete French sequence autoregressively.
+It trains autoregressively to predict `target_word` after `target_text`,
+then predicts the complete French sequence one token at a time.
 It is intentionally a one-example overfitting test of the architecture, not a
 general-purpose translation system.
 

@@ -22,35 +22,21 @@ def test() -> None:
         [source_tokenizer.encode(SOURCE_TEXT)], dtype=torch.long, device=device
     )
     full_target = target_tokenizer.encode(TARGET_TEXT + " " + TARGET_WORD)
-    target_input = torch.tensor(
-        [full_target[:-1]], dtype=torch.long, device=device
-    )
-    labels = torch.tensor([full_target[1:]], dtype=torch.long, device=device)
+    target_labels = torch.tensor([full_target[1:]], dtype=torch.long, device=device)
 
     with torch.no_grad():
-        logits = model(source_tokens, target_input)
-        loss = nn.CrossEntropyLoss()(logits.reshape(-1, logits.size(-1)), labels.reshape(-1))
-
-        # Give the decoder the French prefix and predict the target word.
-        french_prefix = torch.tensor(
-            [target_tokenizer.encode(TARGET_TEXT, add_special_tokens=False)],
-            dtype=torch.long,
-            device=device,
+        loss_function = nn.CrossEntropyLoss(
+            ignore_index=target_tokenizer.get_pad_id()
         )
-        prefix_with_bos = torch.cat(
-            (
-                 torch.tensor([[target_tokenizer.get_bos_id()]], device=device),
-                french_prefix,
-            ),
-            dim=1,
+        target_input_tokens = torch.tensor(
+            [full_target[:-1]], dtype=torch.long, device=device
         )
-        probabilities = model.probabilities(source_tokens, prefix_with_bos)
-        predicted_id = probabilities[:, -1, :].argmax(dim=-1).item()
+        logits = model(source_tokens, target_input_tokens)
+        loss = loss_function(
+            logits.reshape(-1, logits.size(-1)), target_labels.reshape(-1)
+        )
 
     print(f"test loss: {loss.item():.4f}")
-    print(f"French prefix: {TARGET_TEXT}")
-    print(f"target word: {TARGET_WORD}")
-    print(f"predicted final word: {target_tokenizer.decode([predicted_id])}")
     print(f"full translation: {greedy_translate(model, SOURCE_TEXT, source_tokenizer, target_tokenizer, device)}")
 
 

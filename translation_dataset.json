@@ -1,0 +1,202 @@
+[
+  {
+    "source": "i like apples",
+    "target": "j aime les pommes"
+  },
+  {
+    "source": "i like bananas",
+    "target": "j aime les bananes"
+  },
+  {
+    "source": "i like oranges",
+    "target": "j aime les oranges"
+  },
+  {
+    "source": "i eat apples",
+    "target": "je mange des pommes"
+  },
+  {
+    "source": "i eat bananas",
+    "target": "je mange des bananes"
+  },
+  {
+    "source": "i eat oranges",
+    "target": "je mange des oranges"
+  },
+  {
+    "source": "you like apples",
+    "target": "tu aimes les pommes"
+  },
+  {
+    "source": "you like bananas",
+    "target": "tu aimes les bananes"
+  },
+  {
+    "source": "you like oranges",
+    "target": "tu aimes les oranges"
+  },
+  {
+    "source": "you eat apples",
+    "target": "tu manges des pommes"
+  },
+  {
+    "source": "you eat bananas",
+    "target": "tu manges des bananes"
+  },
+  {
+    "source": "you eat oranges",
+    "target": "tu manges des oranges"
+  },
+  {
+    "source": "he likes apples",
+    "target": "il aime les pommes"
+  },
+  {
+    "source": "he likes bananas",
+    "target": "il aime les bananes"
+  },
+  {
+    "source": "he likes oranges",
+    "target": "il aime les oranges"
+  },
+  {
+    "source": "she likes apples",
+    "target": "elle aime les pommes"
+  },
+  {
+    "source": "she likes bananas",
+    "target": "elle aime les bananes"
+  },
+  {
+    "source": "she likes oranges",
+    "target": "elle aime les oranges"
+  },
+  {
+    "source": "he eats apples",
+    "target": "il mange des pommes"
+  },
+  {
+    "source": "she eats bananas",
+    "target": "elle mange des bananes"
+  },
+  {
+    "source": "i love coffee",
+    "target": "j aime le cafe"
+  },
+  {
+    "source": "i love tea",
+    "target": "j aime le the"
+  },
+  {
+    "source": "i drink water",
+    "target": "je bois de l eau"
+  },
+  {
+    "source": "you drink water",
+    "target": "tu bois de l eau"
+  },
+  {
+    "source": "he drinks water",
+    "target": "il boit de l eau"
+  },
+  {
+    "source": "she drinks tea",
+    "target": "elle boit du the"
+  },
+  {
+    "source": "i read books",
+    "target": "je lis des livres"
+  },
+  {
+    "source": "you read books",
+    "target": "tu lis des livres"
+  },
+  {
+    "source": "he reads books",
+    "target": "il lit des livres"
+  },
+  {
+    "source": "she reads books",
+    "target": "elle lit des livres"
+  },
+  {
+    "source": "i like music",
+    "target": "j aime la musique"
+  },
+  {
+    "source": "you like music",
+    "target": "tu aimes la musique"
+  },
+  {
+    "source": "he likes music",
+    "target": "il aime la musique"
+  },
+  {
+    "source": "she likes music",
+    "target": "elle aime la musique"
+  },
+  {
+    "source": "i like football",
+    "target": "j aime le football"
+  },
+  {
+    "source": "you like football",
+    "target": "tu aimes le football"
+  },
+  {
+    "source": "where are you",
+    "target": "ou es tu"
+  },
+  {
+    "source": "where is the station",
+    "target": "ou est la gare"
+  },
+  {
+    "source": "how are you",
+    "target": "comment vas tu"
+  },
+  {
+    "source": "what is your name",
+    "target": "comment tu t appelles"
+  },
+  {
+    "source": "my name is ayush",
+    "target": "je m appelle ayush"
+  },
+  {
+    "source": "i am learning python",
+    "target": "j apprends le python"
+  },
+  {
+    "source": "i am learning machine learning",
+    "target": "j apprends le machine learning"
+  },
+  {
+    "source": "i study data analytics",
+    "target": "j etudie l analyse de donnees"
+  },
+  {
+    "source": "this is a book",
+    "target": "c est un livre"
+  },
+  {
+    "source": "this is a computer",
+    "target": "c est un ordinateur"
+  },
+  {
+    "source": "the weather is good",
+    "target": "le temps est bon"
+  },
+  {
+    "source": "the food is good",
+    "target": "la nourriture est bonne"
+  },
+  {
+    "source": "i am happy",
+    "target": "je suis heureux"
+  },
+  {
+    "source": "i am ready",
+    "target": "je suis pret"
+  }
+]

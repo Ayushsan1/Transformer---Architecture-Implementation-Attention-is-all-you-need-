@@ -1,9 +1,26 @@
-src_vocab_size = 5000 # (Total unique words in source language — English)
-tgt_vocab_size = 5000 # (Total unique words in target language — German)
+# ============================================================
+# Transformer Configuration
+# ============================================================
 
-d_model = 512 # (Embedding dimension — size of each word vector)
-num_heads = 8 # (Number of parallel attention mechanisms)
-num_layers = 6 # (Number of encoder and decoder blocks to stack)
-d_ff = 2048 # (Feed-forward network hidden layer size)
-max_length_seq = 100 # (Maximum number of words per sentence)
-dropout = 0.1 # (Percentage of neurons to randomly drop — prevents overfitting)
+# These vocabulary values are only defaults.
+# The actual vocabulary size is obtained from the tokenizer.
+src_vocab_size = 50260
+tgt_vocab_size = 50260
+
+# Transformer dimensions
+d_model = 128
+
+# Number of attention heads
+num_heads = 4
+
+# Number of encoder/decoder layers
+num_layers = 2
+
+# Feed-forward network dimension
+d_ff = 256
+
+# Maximum sequence length supported by the model
+max_length_seq = 32
+
+# Dropout value kept for future use
+dropout = 0.1

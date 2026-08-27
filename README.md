@@ -4,7 +4,7 @@ A step-by-step, object-oriented implementation of the original Transformer archi
 
 This project is a learning-focused implementation of the Transformer described in *Attention Is All You Need*. Each major stage of the architecture is implemented in its own Python file so that the individual components can be understood, tested, and combined.
 
-> **Project status:** The encoder-decoder architecture is runnable. The included `transformer.py` trains on one short English-to-French example and tests greedy autoregressive translation.
+> **Project status:** The encoder-decoder architecture is runnable. The included `train.py` trains on the checked-in English-to-French dataset without teacher forcing and saves the best validation checkpoint.
 
 ## What This Project Demonstrates
 
@@ -14,6 +14,8 @@ The current implementation includes:
 
 - A central `config.py` file for shared Transformer hyperparameters
 - A `WordTokenizer` wrapper around GPT-2 `tiktoken` for converting text into token IDs
+- A translation dataset loader with deterministic train, validation, and test splits
+- Dynamic batch padding for variable-length token sequences
 - An `InputEmbedding` class for converting token IDs into vector representations
 - A `PositionalEncoding` class for adding token-order information
 - Multi-head self-attention
@@ -91,48 +93,29 @@ flowchart TD
 | `MaskMHA.py` | Masked multi-head attention | Complete |
 | `CrossAttention.py` | Decoder-to-encoder cross-attention | Complete |
 | `Decoder_block.py` | Decoder layer and configurable decoder stack | Complete |
-| `transformer.py` | Full model, toy training loop, and greedy translation test | Complete |
+| `dataset.py` | Translation dataset loading, splitting, and batch padding | Complete |
+| `translation_dataset.json` | English-to-French sentence-pair dataset | Available |
+| `train.py` | Autoregressive training, validation, and checkpoint saving | Complete |
+| `transformer.py` | Full model, tokenizer, and greedy translation utility | Complete |
 
 ## End-to-End Translation Demo
 
-Run the complete toy translation experiment with:
+Run the dataset-based autoregressive training experiment with:
 
 ```bash
-python transformer.py
+python train.py
 ```
 
-The script uses the GPT-2 subword vocabulary and makes the learning target
-explicit:
+The training script:
 
-```python
-source_text = "i like apples"
-target_text = "j aime les"
-target_word = "pommes"
-```
+- loads the 50 sentence pairs from `translation_dataset.json`
+- creates deterministic 80%/10%/10% train, validation, and test splits
+- tokenizes and dynamically pads each batch
+- trains autoregressively with teacher forcing disabled
+- saves the best model to `transformer_model_no_tf.pt`
 
-It trains autoregressively to predict `target_word` after `target_text`,
-then predicts the complete French sequence one token at a time.
-It is intentionally a one-example overfitting test of the architecture, not a
-general-purpose translation system.
-
-Possible future files include:
-
-```text
-layer_normalization.py
-feed_forward.py
-multi_head_attention.py
-encoder_layer.py
-encoder.py
-decoder_layer.py
-decoder.py
-projection.py
-transformer.py
-masks.py
-train.py
-inference.py
-```
-
-The exact file structure may evolve as each component is implemented and tested.
+The dataset and model are intended for experimentation and architecture
+learning, not production-quality translation.
 
 ## Configuration
 
@@ -147,6 +130,10 @@ The main model parameters are defined in `config.py`:
 - Dropout probability
 
 `TransformerEncoder` uses these values by default, and each value can be overridden through its constructor. Individual modules import the shared values so the components remain compatible as they are connected.
+
+The default training settings in `train.py` are 100 epochs, a batch size of 8,
+an Adam learning rate of `0.001`, and a fixed random seed of 7. Training uses
+the GPU when CUDA is available and otherwise falls back to the CPU.
 
 ## Setup
 
@@ -176,6 +163,10 @@ Encoder output shape: torch.Size([1, 7, 512])
 
 The first dimension is the batch size, the second is the token sequence length, and the final dimension is `d_model`.
 
+To inspect the full training workflow, run `python train.py`. The script prints
+training and validation loss and writes the best validation checkpoint beside
+the source files.
+
 ## Learning Goal
 
-The purpose of this project is not only to produce a working Transformer, but also to understand how the architecture is constructed from smaller object-oriented components. The completed encoder provides the first end-to-end path from text to contextualized representations; future decoder work will extend it into the complete Transformer model.
+The purpose of this project is not only to produce a working Transformer, but also to understand how the architecture is constructed from smaller object-oriented components. The project now provides an end-to-end path from sentence-pair data through tokenization, padded batches, encoder-decoder training, validation, and greedy autoregressive translation.

@@ -132,3 +132,5 @@ venv.bak/
 
 # antigravity-ide / gemini artifacts
 .gemini/
+
+transformer_model_no_tf.pt

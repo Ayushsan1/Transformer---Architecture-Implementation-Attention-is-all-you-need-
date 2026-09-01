@@ -457,6 +457,13 @@ def train(
                     "model_state": (
                         model.state_dict()
                     ),
+                    "optimizer_state": (
+                        optimizer.state_dict()
+                    ),
+                    "lr_scheduler_state": (
+                        lr_scheduler.state_dict()
+                    ),
+                    "epoch": epoch,
                     "model_config": (
                         model.model_config
                     ),

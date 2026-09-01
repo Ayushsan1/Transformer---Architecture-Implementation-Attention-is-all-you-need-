@@ -23,6 +23,8 @@ CHECKPOINT_PATH = (
     / "transformer_model_no_tf.pt"
 )
 
+RESUME_CHECKPOINT_PATH = CHECKPOINT_PATH
+
 SEED = 7
 
 BATCH_SIZE = 8
@@ -210,6 +212,63 @@ def evaluate(
     return total_loss / batches
 
 
+def save_checkpoint(
+    model,
+    optimizer,
+    lr_scheduler,
+    epoch,
+    best_validation_loss,
+    checkpoint_path: str | Path = CHECKPOINT_PATH,
+):
+    checkpoint = {
+        "model_state": model.state_dict(),
+        "optimizer_state": optimizer.state_dict(),
+        "epoch": epoch,
+        "best_validation_loss": best_validation_loss,
+        "model_config": getattr(model, "model_config", None),
+        "source_pad_id": None,
+        "target_pad_id": None,
+        "tokenizer_name": "gpt2",
+    }
+
+    if lr_scheduler is not None:
+        checkpoint["lr_scheduler_state"] = lr_scheduler.state_dict()
+
+    checkpoint_path = Path(checkpoint_path)
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(checkpoint, checkpoint_path)
+
+    return checkpoint_path
+
+
+def load_checkpoint(
+    model,
+    optimizer,
+    lr_scheduler,
+    checkpoint_path: str | Path,
+    device,
+):
+    checkpoint_path = Path(checkpoint_path)
+    if not checkpoint_path.exists():
+        return 0, float("inf")
+
+    checkpoint = torch.load(
+        checkpoint_path,
+        map_location=device,
+    )
+
+    model.load_state_dict(checkpoint["model_state"])
+    optimizer.load_state_dict(checkpoint["optimizer_state"])
+
+    if lr_scheduler is not None and "lr_scheduler_state" in checkpoint:
+        lr_scheduler.load_state_dict(checkpoint["lr_scheduler_state"])
+
+    return checkpoint.get("epoch", 0), checkpoint.get(
+        "best_validation_loss",
+        float("inf"),
+    )
+
+
 # ============================================================
 # Main Training Function
 # ============================================================
@@ -217,6 +276,8 @@ def evaluate(
 def train(
     epochs: int = EPOCHS,
     learning_rate: float = LEARNING_RATE,
+    use_lr_scheduler: bool = False,
+    resume_checkpoint_path: str | Path | None = None,
 ):
 
     device = torch.device(
@@ -348,18 +409,21 @@ def train(
         ),
     ).to(device)
 
-
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=learning_rate,
     )
-#LR scheduler that reduces the learning rate when a metric has stopped improving. 
-#In this case, we monitor the validation loss and reduce the learning rate if it doesn't improve for 10 epochs. This can help the model converge better during training.
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode="min",
-        patience=10,
-    )
+
+    if use_lr_scheduler:
+        print("LR scheduler enabled: ReduceLROnPlateau(mode='min', patience=10)")
+        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode="min",
+            patience=10,
+        )
+    else:
+        lr_scheduler = None
+        print("LR scheduler disabled.")
 
     loss_function = nn.CrossEntropyLoss(
         ignore_index=(
@@ -367,11 +431,30 @@ def train(
         )
     )
 
+    checkpoint_path = (
+        Path(resume_checkpoint_path)
+        if resume_checkpoint_path is not None
+        else RESUME_CHECKPOINT_PATH
+    )
 
+    start_epoch = 1
     best_validation_loss = float("inf")
 
+    if checkpoint_path.exists():
+        resume_epoch, best_validation_loss = load_checkpoint(
+            model=model,
+            optimizer=optimizer,
+            lr_scheduler=lr_scheduler,
+            checkpoint_path=checkpoint_path,
+            device=device,
+        )
+        start_epoch = resume_epoch + 1
+        print(f"Resuming training from {checkpoint_path} at epoch {start_epoch}.")
+    else:
+        print(f"No saved checkpoint found at {checkpoint_path}. Training from scratch.")
+
     for epoch in range(
-        1,
+        start_epoch,
         epochs + 1,
     ):
 
@@ -432,7 +515,8 @@ def train(
             device=device,
         )
 
-        lr_scheduler.step(validation_loss)
+        if use_lr_scheduler and lr_scheduler is not None:
+            lr_scheduler.step(validation_loss)
 
         if (
             epoch == 1
@@ -452,27 +536,14 @@ def train(
                 validation_loss
             )
 
-            torch.save(
-                {
-                    "model_state": (
-                        model.state_dict()
-                    ),
-                    "model_config": (
-                        model.model_config
-                    ),
-                    "tokenizer_name": "gpt2",
-                    "source_pad_id": (
-                        source_tokenizer.get_pad_id()
-                    ),
-                    "target_pad_id": (
-                        target_tokenizer.get_pad_id()
-                    ),
-                    "best_validation_loss": (
-                        best_validation_loss
-                    ),
-                },
-                CHECKPOINT_PATH,
-            )
+        save_checkpoint(
+            model=model,
+            optimizer=optimizer,
+            lr_scheduler=lr_scheduler,
+            epoch=epoch,
+            best_validation_loss=best_validation_loss,
+            checkpoint_path=checkpoint_path,
+        )
 
     print()
     print("=" * 60)
@@ -495,4 +566,9 @@ def train(
 
 
 if __name__ == "__main__":
-    train()
+    train(
+        epochs=EPOCHS,
+        learning_rate=LEARNING_RATE,
+        use_lr_scheduler=False,
+        resume_checkpoint_path=CHECKPOINT_PATH,
+    )

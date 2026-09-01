@@ -441,17 +441,22 @@ def train(
     best_validation_loss = float("inf")
 
     if checkpoint_path.exists():
-        resume_epoch, best_validation_loss = load_checkpoint(
+        _, best_validation_loss = load_checkpoint(
             model=model,
             optimizer=optimizer,
             lr_scheduler=lr_scheduler,
             checkpoint_path=checkpoint_path,
             device=device,
         )
-        start_epoch = resume_epoch + 1
-        print(f"Resuming training from {checkpoint_path} at epoch {start_epoch}.")
+        print(
+            f"Loaded best checkpoint weights from {checkpoint_path}. "
+            "Starting fine-tuning from epoch 1 with saved model state."
+        )
     else:
-        print(f"No saved checkpoint found at {checkpoint_path}. Training from scratch.")
+        print(
+            f"No saved checkpoint found at {checkpoint_path}. "
+            "Training from scratch."
+        )
 
     for epoch in range(
         start_epoch,

@@ -13,7 +13,6 @@ from dataset import (
     create_collate_fn,
 )
 
-
 DATASET_PATH = (
     Path(__file__).parent
     / "translation_dataset.json"
@@ -340,10 +339,6 @@ def train(
         pin_memory=torch.cuda.is_available(),
     )
 
-    # --------------------------------------------------------
-    # Model
-    # --------------------------------------------------------
-
     model = Transformer(
         source_vocab_size=(
             source_tokenizer.get_vocab_size()
@@ -353,18 +348,17 @@ def train(
         ),
     ).to(device)
 
-    # --------------------------------------------------------
-    # Optimizer
-    # --------------------------------------------------------
 
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=learning_rate,
     )
 
-    # --------------------------------------------------------
-    # Loss
-    # --------------------------------------------------------
+    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode="min",
+        patience=10,
+    )
 
     loss_function = nn.CrossEntropyLoss(
         ignore_index=(
@@ -372,9 +366,6 @@ def train(
         )
     )
 
-    # --------------------------------------------------------
-    # Training
-    # --------------------------------------------------------
 
     best_validation_loss = float("inf")
 
@@ -440,6 +431,8 @@ def train(
             device=device,
         )
 
+        lr_scheduler.step(validation_loss)
+
         if (
             epoch == 1
             or epoch % 5 == 0
@@ -450,10 +443,7 @@ def train(
                 f"train loss: {train_loss:.4f} | "
                 f"validation loss: {validation_loss:.4f}"
             )
-
-        # ----------------------------------------------------
-        # Save best model
-        # ----------------------------------------------------
+#Save the best model
 
         if validation_loss < best_validation_loss:
 

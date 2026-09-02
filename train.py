@@ -355,10 +355,10 @@ def train(
     )
 #LR scheduler that reduces the learning rate when a metric has stopped improving. 
 #In this case, we monitor the validation loss and reduce the learning rate if it doesn't improve for 10 epochs. This can help the model converge better during training.
-    lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    lambda_lr = lambda epoch: 0.95 ** epoch
+    lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
-        mode="min",
-        patience=10,
+        lr_lamda=lambda_lr,
     )
 
     loss_function = nn.CrossEntropyLoss(
@@ -432,7 +432,7 @@ def train(
             device=device,
         )
 
-        lr_scheduler.step(validation_loss)
+        lr_scheduler.step()
 
         if (
             epoch == 1

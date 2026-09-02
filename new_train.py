@@ -415,11 +415,10 @@ def train(
     )
 
     if use_lr_scheduler:
-        print("LR scheduler enabled: ReduceLROnPlateau(mode='min', patience=10)")
-        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        print("LR scheduler enabled: LamdaLR with decay factor of0.95 per epoch.")
+        lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
             optimizer,
-            mode="min",
-            patience=10,
+            lr_Lambda=lambda epoch: 0.95 ** epoch
         )
     else:
         lr_scheduler = None
@@ -521,7 +520,7 @@ def train(
         )
 
         if use_lr_scheduler and lr_scheduler is not None:
-            lr_scheduler.step(validation_loss)
+            lr_scheduler.step()
 
         if (
             epoch == 1

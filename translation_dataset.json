@@ -198,5 +198,405 @@
   {
     "source": "i am ready",
     "target": "je suis pret"
+  },
+  {
+    "source": "i have a book",
+    "target": "j ai un livre"
+  },
+  {
+    "source": "i have a computer",
+    "target": "j ai un ordinateur"
+  },
+  {
+    "source": "i have a phone",
+    "target": "j ai un telephone"
+  },
+  {
+    "source": "you have a book",
+    "target": "tu as un livre"
+  },
+  {
+    "source": "you have a computer",
+    "target": "tu as un ordinateur"
+  },
+  {
+    "source": "you have a phone",
+    "target": "tu as un telephone"
+  },
+  {
+    "source": "he has a book",
+    "target": "il a un livre"
+  },
+  {
+    "source": "he has a computer",
+    "target": "il a un ordinateur"
+  },
+  {
+    "source": "he has a phone",
+    "target": "il a un telephone"
+  },
+  {
+    "source": "she has a book",
+    "target": "elle a un livre"
+  },
+  {
+    "source": "she has a computer",
+    "target": "elle a un ordinateur"
+  },
+  {
+    "source": "she has a phone",
+    "target": "elle a un telephone"
+  },
+  {
+    "source": "i want coffee",
+    "target": "je veux du cafe"
+  },
+  {
+    "source": "i want tea",
+    "target": "je veux du the"
+  },
+  {
+    "source": "i want water",
+    "target": "je veux de l eau"
+  },
+  {
+    "source": "you want coffee",
+    "target": "tu veux du cafe"
+  },
+  {
+    "source": "you want tea",
+    "target": "tu veux du the"
+  },
+  {
+    "source": "you want water",
+    "target": "tu veux de l eau"
+  },
+  {
+    "source": "he wants coffee",
+    "target": "il veut du cafe"
+  },
+  {
+    "source": "he wants tea",
+    "target": "il veut du the"
+  },
+  {
+    "source": "he wants water",
+    "target": "il veut de l eau"
+  },
+  {
+    "source": "she wants coffee",
+    "target": "elle veut du cafe"
+  },
+  {
+    "source": "she wants tea",
+    "target": "elle veut du the"
+  },
+  {
+    "source": "she wants water",
+    "target": "elle veut de l eau"
+  },
+  {
+    "source": "i need a book",
+    "target": "j ai besoin d un livre"
+  },
+  {
+    "source": "i need a computer",
+    "target": "j ai besoin d un ordinateur"
+  },
+  {
+    "source": "i need water",
+    "target": "j ai besoin d eau"
+  },
+  {
+    "source": "you need a book",
+    "target": "tu as besoin d un livre"
+  },
+  {
+    "source": "you need a computer",
+    "target": "tu as besoin d un ordinateur"
+  },
+  {
+    "source": "you need water",
+    "target": "tu as besoin d eau"
+  },
+  {
+    "source": "he needs a book",
+    "target": "il a besoin d un livre"
+  },
+  {
+    "source": "he needs a computer",
+    "target": "il a besoin d un ordinateur"
+  },
+  {
+    "source": "he needs water",
+    "target": "il a besoin d eau"
+  },
+  {
+    "source": "she needs a book",
+    "target": "elle a besoin d un livre"
+  },
+  {
+    "source": "she needs a computer",
+    "target": "elle a besoin d un ordinateur"
+  },
+  {
+    "source": "she needs water",
+    "target": "elle a besoin d eau"
+  },
+  {
+    "source": "i see a cat",
+    "target": "je vois un chat"
+  },
+  {
+    "source": "i see a dog",
+    "target": "je vois un chien"
+  },
+  {
+    "source": "i see a car",
+    "target": "je vois une voiture"
+  },
+  {
+    "source": "you see a cat",
+    "target": "tu vois un chat"
+  },
+  {
+    "source": "you see a dog",
+    "target": "tu vois un chien"
+  },
+  {
+    "source": "you see a car",
+    "target": "tu vois une voiture"
+  },
+  {
+    "source": "he sees a cat",
+    "target": "il voit un chat"
+  },
+  {
+    "source": "he sees a dog",
+    "target": "il voit un chien"
+  },
+  {
+    "source": "he sees a car",
+    "target": "il voit une voiture"
+  },
+  {
+    "source": "she sees a cat",
+    "target": "elle voit un chat"
+  },
+  {
+    "source": "she sees a dog",
+    "target": "elle voit un chien"
+  },
+  {
+    "source": "she sees a car",
+    "target": "elle voit une voiture"
+  },
+  {
+    "source": "i have a cat",
+    "target": "j ai un chat"
+  },
+  {
+    "source": "i have a dog",
+    "target": "j ai un chien"
+  },
+  {
+    "source": "you have a cat",
+    "target": "tu as un chat"
+  },
+  {
+    "source": "you have a dog",
+    "target": "tu as un chien"
+  },
+  {
+    "source": "he has a cat",
+    "target": "il a un chat"
+  },
+  {
+    "source": "he has a dog",
+    "target": "il a un chien"
+  },
+  {
+    "source": "she has a cat",
+    "target": "elle a un chat"
+  },
+  {
+    "source": "she has a dog",
+    "target": "elle a un chien"
+  },
+  {
+    "source": "i go home",
+    "target": "je vais a la maison"
+  },
+  {
+    "source": "you go home",
+    "target": "tu vas a la maison"
+  },
+  {
+    "source": "he goes home",
+    "target": "il va a la maison"
+  },
+  {
+    "source": "she goes home",
+    "target": "elle va a la maison"
+  },
+  {
+    "source": "i go to school",
+    "target": "je vais a l ecole"
+  },
+  {
+    "source": "you go to school",
+    "target": "tu vas a l ecole"
+  },
+  {
+    "source": "he goes to school",
+    "target": "il va a l ecole"
+  },
+  {
+    "source": "she goes to school",
+    "target": "elle va a l ecole"
+  },
+  {
+    "source": "i play football",
+    "target": "je joue au football"
+  },
+  {
+    "source": "you play football",
+    "target": "tu joues au football"
+  },
+  {
+    "source": "he plays football",
+    "target": "il joue au football"
+  },
+  {
+    "source": "she plays football",
+    "target": "elle joue au football"
+  },
+  {
+    "source": "i like cats",
+    "target": "j aime les chats"
+  },
+  {
+    "source": "i like dogs",
+    "target": "j aime les chiens"
+  },
+  {
+    "source": "you like cats",
+    "target": "tu aimes les chats"
+  },
+  {
+    "source": "you like dogs",
+    "target": "tu aimes les chiens"
+  },
+  {
+    "source": "he likes cats",
+    "target": "il aime les chats"
+  },
+  {
+    "source": "he likes dogs",
+    "target": "il aime les chiens"
+  },
+  {
+    "source": "she likes cats",
+    "target": "elle aime les chats"
+  },
+  {
+    "source": "she likes dogs",
+    "target": "elle aime les chiens"
+  },
+  {
+    "source": "i cook food",
+    "target": "je cuisine la nourriture"
+  },
+  {
+    "source": "you cook food",
+    "target": "tu cuisines la nourriture"
+  },
+  {
+    "source": "he cooks food",
+    "target": "il cuisine la nourriture"
+  },
+  {
+    "source": "she cooks food",
+    "target": "elle cuisine la nourriture"
+  },
+  {
+    "source": "i write books",
+    "target": "j ecris des livres"
+  },
+  {
+    "source": "you write books",
+    "target": "tu ecris des livres"
+  },
+  {
+    "source": "he writes books",
+    "target": "il ecrit des livres"
+  },
+  {
+    "source": "she writes books",
+    "target": "elle ecrit des livres"
+  },
+  {
+    "source": "i speak french",
+    "target": "je parle francais"
+  },
+  {
+    "source": "you speak french",
+    "target": "tu parles francais"
+  },
+  {
+    "source": "he speaks french",
+    "target": "il parle francais"
+  },
+  {
+    "source": "she speaks french",
+    "target": "elle parle francais"
+  },
+  {
+    "source": "i speak english",
+    "target": "je parle anglais"
+  },
+  {
+    "source": "you speak english",
+    "target": "tu parles anglais"
+  },
+  {
+    "source": "he speaks english",
+    "target": "il parle anglais"
+  },
+  {
+    "source": "she speaks english",
+    "target": "elle parle anglais"
+  },
+  {
+    "source": "i understand french",
+    "target": "je comprends le francais"
+  },
+  {
+    "source": "you understand french",
+    "target": "tu comprends le francais"
+  },
+  {
+    "source": "he understands french",
+    "target": "il comprend le francais"
+  },
+  {
+    "source": "she understands french",
+    "target": "elle comprend le francais"
+  },
+  {
+    "source": "i read the newspaper",
+    "target": "je lis le journal"
+  },
+  {
+    "source": "you read the newspaper",
+    "target": "tu lis le journal"
+  },
+  {
+    "source": "he reads the newspaper",
+    "target": "il lit le journal"
+  },
+  {
+    "source": "she reads the newspaper",
+    "target": "elle lit le journal"
   }
 ]

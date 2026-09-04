@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+from log_utils import setup_logger
 from transformer import Transformer, WordTokenizer
 from dataset import (
     TranslationDataset,
@@ -276,37 +277,25 @@ def load_checkpoint(
 def train(
     epochs: int = EPOCHS,
     learning_rate: float = LEARNING_RATE,
-    use_lr_scheduler: bool = False,
-    resume_checkpoint_path: str | Path | None = None,
-):
+    use_lr_scheduler: bool = True,
+    resume_checkpoint_path: str | Path | None = None,):
 
+    logger = setup_logger("train")
     device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "cpu"
+        "cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    print("=" * 60)
-    print("TRANSFORMER AUTOREGRESSIVE TRAINING")
-    print("=" * 60)
+    logger.info("=" * 60)
+    logger.info("TRANSFORMER AUTOREGRESSIVE TRAINING")
+    logger.info("=" * 60)
 
-    print(
-        f"Training device: {device}"
-    )
+    logger.info("Training device: %s", device)
 
     if torch.cuda.is_available():
+        logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
-        print(
-            f"GPU: {torch.cuda.get_device_name(0)}"
-        )
-
-    print(
-        f"Dataset: {DATASET_PATH}"
-    )
-
-    print(
-        f"Teacher forcing: DISABLED"
-    )
+    logger.info("Dataset: %s", DATASET_PATH)
+    logger.info("Teacher forcing: DISABLED")
 
     # --------------------------------------------------------
     # Tokenizers
@@ -315,15 +304,8 @@ def train(
     source_tokenizer = WordTokenizer()
     target_tokenizer = WordTokenizer()
 
-    print(
-        f"Source vocabulary: "
-        f"{source_tokenizer.get_vocab_size()}"
-    )
-
-    print(
-        f"Target vocabulary: "
-        f"{target_tokenizer.get_vocab_size()}"
-    )
+    logger.info("Source vocabulary: %s", source_tokenizer.get_vocab_size())
+    logger.info("Target vocabulary: %s", target_tokenizer.get_vocab_size())
 
     # --------------------------------------------------------
     # Load dataset
@@ -333,11 +315,9 @@ def train(
         DATASET_PATH
     )
 
-    print(
-        f"Total sentence pairs: {len(data)}"
-    )
+    logger.info("Total sentence pairs: %s", len(data))
 
-    train_data, validation_data, test_data = (
+    train_data, validation_data, _ = (
         split_dataset(
             data,
             train_ratio=0.8,
@@ -346,18 +326,8 @@ def train(
         )
     )
 
-    print(
-        f"Training examples: {len(train_data)}"
-    )
-
-    print(
-        f"Validation examples: "
-        f"{len(validation_data)}"
-    )
-
-    print(
-        f"Test examples: {len(test_data)}"
-    )
+    logger.info("Training examples: %s", len(train_data))
+    logger.info("Validation examples: %s", len(validation_data))
 
     # --------------------------------------------------------
     # Dataset objects
@@ -369,10 +339,6 @@ def train(
 
     validation_dataset = TranslationDataset(
         validation_data
-    )
-
-    test_dataset = TranslationDataset(
-        test_data
     )
 
     # --------------------------------------------------------
@@ -415,14 +381,14 @@ def train(
     )
 
     if use_lr_scheduler:
-        print("LR scheduler enabled: LamdaLR with decay factor of0.95 per epoch.")
+        logger.info("LR scheduler enabled: LamdaLR with decay factor of 0.95 per epoch.")
         lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
             optimizer,
-            lr_Lambda=lambda epoch: 0.95 ** epoch
+            lr_lambda=lambda epoch: 0.95 ** epoch
         )
     else:
         lr_scheduler = None
-        print("LR scheduler disabled.")
+        logger.info("LR scheduler disabled.")
 
     loss_function = nn.CrossEntropyLoss(
         ignore_index=(
@@ -447,14 +413,14 @@ def train(
             checkpoint_path=checkpoint_path,
             device=device,
         )
-        print(
-            f"Loaded best checkpoint weights from {checkpoint_path}. "
-            "Starting fine-tuning from epoch 1 with saved model state."
+        logger.info(
+            "Loaded best checkpoint weights from %s. Starting fine-tuning from epoch 1 with saved model state.",
+            checkpoint_path,
         )
     else:
-        print(
-            f"No saved checkpoint found at {checkpoint_path}. "
-            "Training from scratch."
+        logger.info(
+            "No saved checkpoint found at %s. Training from scratch.",
+            checkpoint_path,
         )
 
     for epoch in range(
@@ -527,12 +493,15 @@ def train(
             or epoch % 5 == 0
         ):
 
-            print(
-                f"Epoch {epoch:>3}/{epochs} | "
-                f"train loss: {train_loss:.4f} | "
-                f"validation loss: {validation_loss:.4f}"
+            logger.info(
+                "Epoch %3d/%d | train loss: %.4f | validation loss: %.4f",
+                epoch,
+                epochs,
+                train_loss,
+                validation_loss,
             )
-#Save the best model
+
+        # Save the best model
 
         if validation_loss < best_validation_loss:
 
@@ -549,30 +518,20 @@ def train(
             checkpoint_path=checkpoint_path,
         )
 
-    print()
-    print("=" * 60)
-    print("TRAINING COMPLETE")
-    print("=" * 60)
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("TRAINING COMPLETE")
+    logger.info("=" * 60)
 
-    print(
-        f"Best validation loss: "
-        f"{best_validation_loss:.4f}"
-    )
-
-    print(
-        f"Checkpoint saved to:\n"
-        f"{CHECKPOINT_PATH}"
-    )
-
-    print(
-        f"Training device: {device}"
-    )
+    logger.info("Best validation loss: %.4f", best_validation_loss)
+    logger.info("Checkpoint saved to:\n%s", CHECKPOINT_PATH)
+    logger.info("Training device: %s", device)
 
 
 if __name__ == "__main__":
     train(
         epochs=EPOCHS,
         learning_rate=LEARNING_RATE,
-        use_lr_scheduler=False,
+        use_lr_scheduler=True,
         resume_checkpoint_path=CHECKPOINT_PATH,
     )

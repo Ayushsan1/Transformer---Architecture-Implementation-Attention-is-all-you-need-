@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
+from log_utils import setup_logger
 from transformer import Transformer, WordTokenizer
 from dataset import (
     TranslationDataset,
@@ -218,6 +219,7 @@ def train(
     epochs: int = EPOCHS,
     learning_rate: float = LEARNING_RATE,
 ):
+    logger = setup_logger("train")
 
     device = torch.device(
         "cuda"
@@ -225,27 +227,16 @@ def train(
         else "cpu"
     )
 
-    print("=" * 60)
-    print("TRANSFORMER AUTOREGRESSIVE TRAINING")
-    print("=" * 60)
-
-    print(
-        f"Training device: {device}"
-    )
+    logger.info("=" * 60)
+    logger.info("TRANSFORMER AUTOREGRESSIVE TRAINING")
+    logger.info("=" * 60)
+    logger.info("Training device: %s", device)
 
     if torch.cuda.is_available():
+        logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
-        print(
-            f"GPU: {torch.cuda.get_device_name(0)}"
-        )
-
-    print(
-        f"Dataset: {DATASET_PATH}"
-    )
-
-    print(
-        f"Teacher forcing: DISABLED"
-    )
+    logger.info("Dataset: %s", DATASET_PATH)
+    logger.info("Teacher forcing: DISABLED")
 
     # --------------------------------------------------------
     # Tokenizers
@@ -254,65 +245,34 @@ def train(
     source_tokenizer = WordTokenizer()
     target_tokenizer = WordTokenizer()
 
-    print(
-        f"Source vocabulary: "
-        f"{source_tokenizer.get_vocab_size()}"
-    )
-
-    print(
-        f"Target vocabulary: "
-        f"{target_tokenizer.get_vocab_size()}"
-    )
+    logger.info("Source vocabulary: %s", source_tokenizer.get_vocab_size())
+    logger.info("Target vocabulary: %s", target_tokenizer.get_vocab_size())
 
     # --------------------------------------------------------
     # Load dataset
     # --------------------------------------------------------
 
-    data = load_translation_data(
-        DATASET_PATH
+    data = load_translation_data(DATASET_PATH)
+    logger.info("Total sentence pairs: %s", len(data))
+
+    train_data, validation_data, test_data = split_dataset(
+        data,
+        train_ratio=0.8,
+        validation_ratio=0.1,
+        seed=SEED,
     )
 
-    print(
-        f"Total sentence pairs: {len(data)}"
-    )
-
-    train_data, validation_data, test_data = (
-        split_dataset(
-            data,
-            train_ratio=0.8,
-            validation_ratio=0.1,
-            seed=SEED,
-        )
-    )
-
-    print(
-        f"Training examples: {len(train_data)}"
-    )
-
-    print(
-        f"Validation examples: "
-        f"{len(validation_data)}"
-    )
-
-    print(
-        f"Test examples: {len(test_data)}"
-    )
+    logger.info("Training examples: %s", len(train_data))
+    logger.info("Validation examples: %s", len(validation_data))
+    logger.info("Test examples: %s", len(test_data))
 
     # --------------------------------------------------------
     # Dataset objects
     # --------------------------------------------------------
 
-    train_dataset = TranslationDataset(
-        train_data
-    )
-
-    validation_dataset = TranslationDataset(
-        validation_data
-    )
-
-    test_dataset = TranslationDataset(
-        test_data
-    )
+    train_dataset = TranslationDataset(train_data)
+    validation_dataset = TranslationDataset(validation_data)
+    test_dataset = TranslationDataset(test_data)
 
     # --------------------------------------------------------
     # DataLoader
@@ -340,61 +300,38 @@ def train(
     )
 
     model = Transformer(
-        source_vocab_size=(
-            source_tokenizer.get_vocab_size()
-        ),
-        target_vocab_size=(
-            target_tokenizer.get_vocab_size()
-        ),
+        source_vocab_size=source_tokenizer.get_vocab_size(),
+        target_vocab_size=target_tokenizer.get_vocab_size(),
     ).to(device)
-
 
     optimizer = torch.optim.Adam(
         model.parameters(),
         lr=learning_rate,
     )
-#LR scheduler that reduces the learning rate when a metric has stopped improving. 
-#In this case, we monitor the validation loss and reduce the learning rate if it doesn't improve for 10 epochs. This can help the model converge better during training.
+
     lambda_lr = lambda epoch: 0.95 ** epoch
     lr_scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer,
-        lr_lamda=lambda_lr,
+        lr_lambda=lambda_lr,
     )
 
     loss_function = nn.CrossEntropyLoss(
-        ignore_index=(
-            target_tokenizer.get_pad_id()
-        )
+        ignore_index=target_tokenizer.get_pad_id()
     )
-
 
     best_validation_loss = float("inf")
 
-    for epoch in range(
-        1,
-        epochs + 1,
-    ):
-
+    for epoch in range(1, epochs + 1):
         model.train()
 
         total_train_loss = 0.0
         train_batches = 0
 
         for batch in train_loader:
+            source_tokens = batch["source_tokens"].to(device, non_blocking=True)
+            target_tokens = batch["target_tokens"].to(device, non_blocking=True)
 
-            source_tokens = (
-                batch["source_tokens"]
-                .to(device, non_blocking=True)
-            )
-
-            target_tokens = (
-                batch["target_tokens"]
-                .to(device, non_blocking=True)
-            )
-
-            optimizer.zero_grad(
-                set_to_none=True
-            )
+            optimizer.zero_grad(set_to_none=True)
 
             loss = autoregressive_training_step(
                 model=model,
@@ -406,22 +343,13 @@ def train(
             )
 
             loss.backward()
-
-            # Prevent exploding gradients.
-            torch.nn.utils.clip_grad_norm_(
-                model.parameters(),
-                max_norm=1.0,
-            )
-
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
 
             total_train_loss += loss.item()
             train_batches += 1
 
-        train_loss = (
-            total_train_loss
-            / max(train_batches, 1)
-        )
+        train_loss = total_train_loss / max(train_batches, 1)
 
         validation_loss = evaluate(
             model=model,
@@ -434,71 +362,39 @@ def train(
 
         lr_scheduler.step()
 
-        if (
-            epoch == 1
-            or epoch % 5 == 0
-        ):
-
-            print(
-                f"Epoch {epoch:>3}/{epochs} | "
-                f"train loss: {train_loss:.4f} | "
-                f"validation loss: {validation_loss:.4f}"
+        if epoch == 1 or epoch % 5 == 0:
+            logger.info(
+                "Epoch %3d/%d | train loss: %.4f | validation loss: %.4f",
+                epoch,
+                epochs,
+                train_loss,
+                validation_loss,
             )
-#Save the best model
 
         if validation_loss < best_validation_loss:
-
-            best_validation_loss = (
-                validation_loss
-            )
-
+            best_validation_loss = validation_loss
             torch.save(
                 {
-                    "model_state": (
-                        model.state_dict()
-                    ),
-                    "optimizer_state": (
-                        optimizer.state_dict()
-                    ),
-                    "lr_scheduler_state": (
-                        lr_scheduler.state_dict()
-                    ),
+                    "model_state": model.state_dict(),
+                    "optimizer_state": optimizer.state_dict(),
+                    "lr_scheduler_state": lr_scheduler.state_dict(),
                     "epoch": epoch,
-                    "model_config": (
-                        model.model_config
-                    ),
+                    "model_config": model.model_config,
                     "tokenizer_name": "gpt2",
-                    "source_pad_id": (
-                        source_tokenizer.get_pad_id()
-                    ),
-                    "target_pad_id": (
-                        target_tokenizer.get_pad_id()
-                    ),
-                    "best_validation_loss": (
-                        best_validation_loss
-                    ),
+                    "source_pad_id": source_tokenizer.get_pad_id(),
+                    "target_pad_id": target_tokenizer.get_pad_id(),
+                    "best_validation_loss": best_validation_loss,
                 },
                 CHECKPOINT_PATH,
             )
 
-    print()
-    print("=" * 60)
-    print("TRAINING COMPLETE")
-    print("=" * 60)
-
-    print(
-        f"Best validation loss: "
-        f"{best_validation_loss:.4f}"
-    )
-
-    print(
-        f"Checkpoint saved to:\n"
-        f"{CHECKPOINT_PATH}"
-    )
-
-    print(
-        f"Training device: {device}"
-    )
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("TRAINING COMPLETE")
+    logger.info("=" * 60)
+    logger.info("Best validation loss: %.4f", best_validation_loss)
+    logger.info("Checkpoint saved to:\n%s", CHECKPOINT_PATH)
+    logger.info("Training device: %s", device)
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from dataset import (
     load_translation_data,
     split_dataset,
 )
+from log_utils import setup_logger
 from transformer import (
     Transformer,
     WordTokenizer,
@@ -25,6 +26,7 @@ SEED = 7
 NUM_TEST_EXAMPLES_TO_SHOW = 10
 
 def test():
+    logger = setup_logger("test")
 
     device = torch.device(
         "cuda"
@@ -32,28 +34,18 @@ def test():
         else "cpu"
     )
 
-    print("=" * 60)
-    print("TRANSFORMER AUTOREGRESSIVE TESTING")
-    print("=" * 60)
-
-    print(
-        f"Device: {device}"
-    )
+    logger.info("=" * 60)
+    logger.info("TRANSFORMER AUTOREGRESSIVE TESTING")
+    logger.info("=" * 60)
+    logger.info("Device: %s", device)
 
     if torch.cuda.is_available():
+        logger.info("GPU: %s", torch.cuda.get_device_name(0))
 
-        print(
-            f"GPU: {torch.cuda.get_device_name(0)}"
-        )
-
-    
     source_tokenizer = WordTokenizer()
     target_tokenizer = WordTokenizer()
 
-    
-
     if not CHECKPOINT_PATH.exists():
-
         raise FileNotFoundError(
             f"Checkpoint not found:\n"
             f"{CHECKPOINT_PATH}\n\n"
@@ -70,28 +62,16 @@ def test():
         {},
     )
 
-    
     model = Transformer(
-        source_vocab_size=(
-            source_tokenizer.get_vocab_size()
-        ),
-        target_vocab_size=(
-            target_tokenizer.get_vocab_size()
-        ),
+        source_vocab_size=source_tokenizer.get_vocab_size(),
+        target_vocab_size=target_tokenizer.get_vocab_size(),
         **model_config,
     ).to(device)
 
-    model.load_state_dict(
-        checkpoint["model_state"]
-    )
-
+    model.load_state_dict(checkpoint["model_state"])
     model.eval()
 
-    
-    data = load_translation_data(
-        DATASET_PATH
-    )
-
+    data = load_translation_data(DATASET_PATH)
     _, _, test_data = split_dataset(
         data,
         train_ratio=0.8,
@@ -99,24 +79,13 @@ def test():
         seed=SEED,
     )
 
-    print()
-    print(
-        f"Test examples: {len(test_data)}"
-    )
+    logger.info("Test examples: %s", len(test_data))
+    logger.info("")
+    logger.info("=" * 60)
+    logger.info("TEST SET PREDICTIONS")
+    logger.info("=" * 60)
 
-    
-    print()
-    print("=" * 60)
-    print("TEST SET PREDICTIONS")
-    print("=" * 60)
-
-    for index, item in enumerate(
-        test_data[
-            :NUM_TEST_EXAMPLES_TO_SHOW
-        ],
-        start=1,
-    ):
-
+    for index, item in enumerate(test_data[:NUM_TEST_EXAMPLES_TO_SHOW], start=1):
         source_text = item["source"]
         target_text = item["target"]
 
@@ -129,27 +98,14 @@ def test():
             max_new_tokens=20,
         )
 
-        print()
-        print(
-            f"Example {index}"
-        )
+        logger.info("")
+        logger.info("Example %s", index)
+        logger.info("Source    : %s", source_text)
+        logger.info("Expected  : %s", target_text)
+        logger.info("Predicted : %s", prediction)
 
-        print(
-            f"Source    : {source_text}"
-        )
-
-        print(
-            f"Expected  : {target_text}"
-        )
-
-        print(
-            f"Predicted : {prediction}"
-        )
-
-    
-    print()
-    print("CUSTOM TRANSLATION")
-    
+    logger.info("")
+    logger.info("CUSTOM TRANSLATION")
 
     custom_source = input(
         "Enter English sentence "
@@ -157,7 +113,6 @@ def test():
     ).strip()
 
     if custom_source:
-
         prediction = greedy_translate(
             model=model,
             source_text=custom_source,
@@ -167,14 +122,9 @@ def test():
             max_new_tokens=20,
         )
 
-        print()
-        print(
-            f"English   : {custom_source}"
-        )
-
-        print(
-            f"French    : {prediction}"
-        )
+        logger.info("")
+        logger.info("English   : %s", custom_source)
+        logger.info("French    : %s", prediction)
 
 
 if __name__ == "__main__":
